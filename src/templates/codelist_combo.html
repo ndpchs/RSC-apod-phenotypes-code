@@ -66,7 +66,8 @@
                             <div class="card-body">
                                 {{ rendered_description_html | safe }}
                                 <h2>SNOMED CT release</h1>
-                                <p>SNOMED CT UK Clinical and Drug Edition, Release {{ snomed_release_identifier }}</p>
+                                <p>SNOMED CT UK Clinical and Drug Edition, Release {{ snomed_release_identifier }} 
+                                    (<a href="{{ rel_path_to_help_codelists }}#Expansion" target="_blank">supplemented with EMIS namespace and inactive codes</a>)</p>
                             </div>
                         </div>
                     </div>
