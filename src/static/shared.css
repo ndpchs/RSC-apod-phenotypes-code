@@ -5,10 +5,11 @@
 
 .top-nav-inner {
     min-height: 99px;
+    position: relative;
 }
 
 .rsc-mark {
-    height: 60px;
+    height: 80px;
     width: auto;
     display: block;
 }
