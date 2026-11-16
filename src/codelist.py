@@ -7,6 +7,7 @@ from read_and_parse import (
 
 from config_locations_etc import *
 
+
 class Codelist:
     __slots__ = [
         "id",
@@ -16,6 +17,7 @@ class Codelist:
         "phenotypes_used_in",
         "brief_description",
         "logical_definition",
+        "logical_definition_version",
         "expansion",
         "description_fullpath",
         "logical_definition_fullpath",
@@ -24,7 +26,7 @@ class Codelist:
 
     def __init__(self, codelist_id=None, codelist_raw_description=None):
         self.id = codelist_id
-        self.id_for_sorting = int(re.sub(r'RSC-C','',self.id))
+        self.id_for_sorting = int(re.sub(r"RSC-C", "", self.id))
         self.raw_description = codelist_raw_description
         self.title = ""
         self.brief_description = ""
@@ -35,10 +37,13 @@ class Codelist:
             "includes_just_concept": [],
             "excludes_plus_descs": [],
             "excludes_just_concept": [],
-            "meds": {("All","A","NULL"): [], ("All","S","NULL"): []}
+            "meds": {("All", "A", "NULL"): [], ("All", "S", "NULL"): []},
         }
-        self.description_fullpath = CODELISTS_OUTPUT_DESCRIPTIONS_DIR + f"{self.id}.html"
-
+        self.logical_definition_version = None
+        self.description_fullpath = (
+            CODELISTS_OUTPUT_DESCRIPTIONS_DIR + f"{self.id}.html"
+        )
+        
         self.title = parse_description_for_title(description=codelist_raw_description)
 
         self.brief_description = parse_description_for_brief_description(

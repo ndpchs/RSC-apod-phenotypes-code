@@ -12,10 +12,11 @@ def read_phenotypes_to_publish(phenotypes_to_publish_file=None):
                 phenotypes_index.append(temp)
     return phenotypes_index
 
+
 def read_snomed_release_identifier_file(snomed_release_identifier_file=None):
     phenotypes_index = []
     with open(snomed_release_identifier_file) as fh:
-        snomed_release_identifier=fh.readlines()[0].strip()
+        snomed_release_identifier = fh.readlines()[0].strip()
     return snomed_release_identifier
 
 
@@ -79,7 +80,6 @@ def parse_phenotype_description_for_is_template_status(phenotype_description=Non
     return is_template
 
 
-
 def parse_description_for_flavour(description=None):
     # look for text following "## data visualisation flavour" (case insensitive) line, and before next "## ...." line found
     in_flavour = False
@@ -97,6 +97,7 @@ def parse_description_for_flavour(description=None):
             flavour += " " + line.strip()
     flavour = flavour.strip()
     return flavour
+
 
 def parse_description_for_section(description=None, header_text=None):
     # look for text following "## data visualisation flavour" (case insensitive) line, and before next "## ...." line found
@@ -117,19 +118,21 @@ def parse_description_for_section(description=None, header_text=None):
     # section_text = section_text.strip()
     return section_text
 
+
 def parse_text_for_codelist_usage(text=None):
     # find all occurrences of RSC-C followed by pure digits
     codelists_mentioned = []
     for line in text:
         codelists_mentioned += re.findall(r"\bRSC-C\d+\b", line)
-    return list(set(codelists_mentioned)) # return deduplicated list
+    return list(set(codelists_mentioned))  # return deduplicated list
+
 
 def parse_text_for_phenotype_usage(text=None):
     # find all occurrences of RSC-C followed by pure digits
     phenotypes_mentioned = []
     for line in text:
         phenotypes_mentioned += re.findall(r"\bRSC-PH\d+\b", line)
-    return list(set(phenotypes_mentioned)) # return deduplicated list
+    return list(set(phenotypes_mentioned))  # return deduplicated list
 
 
 def parse_phenotype_description_for_template_phenotype_usage(
@@ -170,14 +173,20 @@ def read_and_set_expansions(codelists=None):
                 codelist_id = "RSC-C" + row["ConditionID"]
                 concept_id = row["ConceptID"]
                 term = row["PreferredTerm"]
-                if "active" in row.keys(): # active_satatus current "0", "1" or "NULL"(meaning EMIS)
-                    active_status=row["active"]
+                if (
+                    "active" in row.keys()
+                ):  # active_satatus current "0", "1" or "NULL"(meaning EMIS)
+                    active_status = row["active"]
                 else:
-                    active_status=row["ACTIVE"]
-                
+                    active_status = row["ACTIVE"]
+
                 if codelist_id in codelists:
                     codelists[codelist_id].expansion.append(
-                        {"concept_id": concept_id, "term": term, "active_status": active_status}
+                        {
+                            "concept_id": concept_id,
+                            "term": term,
+                            "active_status": active_status,
+                        }
                     )
 
 
@@ -188,6 +197,7 @@ def read_and_set_logical_definitions(codelists=None):
             codelist_id = "RSC-C" + row["ConditionID"]
             operator = row["ECLElement"]
             concept_id = row["ConceptID"]
+            version = row["LastUpdated"]
             term = row["TERM"]
             if codelist_id in codelists:
                 if operator == "AddSubtype":
@@ -201,19 +211,34 @@ def read_and_set_logical_definitions(codelists=None):
                 codelists[codelist_id].logical_definition[clause_type].append(
                     {"concept_id": concept_id, "term": term}
                 )
+                if codelists[codelist_id].logical_definition_version is None:
+                    codelists[codelist_id].logical_definition_version = version
+
 
 def read_and_set_meds_logical_definitions(codelists=None):
     with open(CODELIST_DEFINITIONS_MEDS, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f, delimiter="\t")
         for row in reader:
             codelist_id = "RSC-C" + row["ConditionID"]
-            details_tuple = (row["AMPorVMP"], row["CompoundPreparations"], row["DispensedDoseFormCategoryID"])
+            details_tuple = (
+                row["AMPorVMP"],
+                row["CompoundPreparations"],
+                row["DispensedDoseFormCategoryID"],
+            )
             concept_id = row["IngredientConceptID"]
+            version=row["version"]
             term = row["TERM"]
             if codelist_id in codelists:
-                if details_tuple not in codelists[codelist_id].logical_definition["meds"].keys():
-                    print(f"WARNING Reading meds logical definitions: details tuple {details_tuple} not interpretable - ignoring row '{row}'")
-                else:
-                    codelists[codelist_id].logical_definition["meds"][details_tuple].append(
-                        {"concept_id": concept_id, "term": term}
+                if (
+                    details_tuple
+                    not in codelists[codelist_id].logical_definition["meds"].keys()
+                ):
+                    print(
+                        f"WARNING Reading meds logical definitions: details tuple {details_tuple} not interpretable - ignoring row '{row}'"
                     )
+                else:
+                    codelists[codelist_id].logical_definition["meds"][
+                        details_tuple
+                    ].append({"concept_id": concept_id, "term": term})
+                if codelists[codelist_id].logical_definition_version is None:
+                    codelists[codelist_id].logical_definition_version = version
