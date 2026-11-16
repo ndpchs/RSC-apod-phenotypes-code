@@ -227,6 +227,8 @@ def read_and_set_meds_logical_definitions(codelists=None):
             )
             concept_id = row["IngredientConceptID"]
             version=row["version"]
+            if version=="NULL":
+                version="Initial version" # For meds, when a version has never been superseded there is no associated date
             term = row["TERM"]
             if codelist_id in codelists:
                 if (
