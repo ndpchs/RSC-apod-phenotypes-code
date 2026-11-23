@@ -1,4 +1,4 @@
-# rsc_phenotypes_code
+# RSC-apod-phenotypes-code
 
 This is the code that generates the RCGP RSC phenotypes and codelists repository web pages
 
